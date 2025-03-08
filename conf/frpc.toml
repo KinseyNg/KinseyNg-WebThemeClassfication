@@ -1,0 +1,20 @@
+[common]
+server_addr = frps.kinsey.ng
+server_port = 80
+token = Cwit2016
+
+
+[Jupyter]
+type = tcp
+local_port = 8888
+remote_port = 60888
+
+[JupyterSSH]
+type = tcp
+local_port = 22
+remote_port = 60822
+
+[JupyterFTP]
+type = tcp
+local_port = 21
+remote_port = 60821
