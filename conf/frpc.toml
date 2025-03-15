@@ -1,7 +1,7 @@
 [common]
 server_addr = frps.kinsey.ng
 server_port = 80
-token = Cwit2016
+token = "${FRP_TOKEN}"
 
 
 [Jupyter]

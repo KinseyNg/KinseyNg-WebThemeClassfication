@@ -19,33 +19,40 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Create user and set up home directory
-RUN groupadd -g 1000 user && \
-    useradd -m -u 1000 -g 1000 -s /bin/bash user && \
-    echo "user:Cwit2016" | chpasswd && \
-    adduser user sudo && \
-    echo "user ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+ARG REMOTE_DESKTOP_USER=user
+ARG REMOTE_DESKTOP_PASSWORD
+
+# Create user with sudo access
+RUN useradd -m -s /bin/bash ${REMOTE_DESKTOP_USER} && \
+    usermod -aG sudo ${REMOTE_DESKTOP_USER} && \
+    echo "${REMOTE_DESKTOP_USER}:${REMOTE_DESKTOP_PASSWORD}" | chpasswd && \
+    echo "${REMOTE_DESKTOP_USER} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+# Set up supervisor directories
+RUN mkdir -p /var/log/supervisor /var/run/supervisor /etc/supervisor/conf.d && \
+    chown -R ${REMOTE_DESKTOP_USER}:${REMOTE_DESKTOP_USER} /var/log/supervisor /var/run/supervisor
 
 # Configure supervisord
 COPY docker/remote-desktop/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Set up directories and permissions
-RUN mkdir -p /home/user/work /home/user/.local/share/applications /home/user/.local/bin && \
-    chown -R user:user /home/user
+RUN mkdir -p /home/${REMOTE_DESKTOP_USER}/work /home/${REMOTE_DESKTOP_USER}/.local/share/applications /home/${REMOTE_DESKTOP_USER}/.local/bin && \
+    chown -R ${REMOTE_DESKTOP_USER}:${REMOTE_DESKTOP_USER} /home/${REMOTE_DESKTOP_USER}
 
 # Switch to the user
-USER user
+USER ${REMOTE_DESKTOP_USER}
 
 # Set up environment variables
-ENV PATH="/home/user/.local/bin:${PATH}"
-ENV XDG_DATA_HOME="/home/user/.local/share"
-ENV XDG_CONFIG_HOME="/home/user/.config"
+ENV PATH="/home/${REMOTE_DESKTOP_USER}/.local/bin:${PATH}"
+ENV XDG_DATA_HOME="/home/${REMOTE_DESKTOP_USER}/.local/share"
+ENV XDG_CONFIG_HOME="/home/${REMOTE_DESKTOP_USER}/.config"
 
 # Install Windsurf for the user
 RUN mkdir -p "${XDG_DATA_HOME}/applications" "${XDG_CONFIG_HOME}" && \
     curl -s https://raw.githubusercontent.com/PumpkinSeed/windsurf-installer/refs/heads/main/install.sh | bash
 
 # Set the default working directory
-WORKDIR /home/user/work
+WORKDIR /home/${REMOTE_DESKTOP_USER}/work
 
 # Start supervisord
 CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

@@ -10,9 +10,12 @@ services:
       - "8888:8888"
       - "21:21"
       - "60822:22"
-    command: "start-notebook.sh --NotebookApp.token="
+    command: "start-notebook.sh --NotebookApp.token=${JUPYTER_TOKEN} --NotebookApp.password=${JUPYTER_PASSWORD} --NotebookApp.ip='0.0.0.0'"
     environment:
-      - PASSWORD=password
+      - PASSWORD=${REMOTE_DESKTOP_PASSWORD}
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all,compute,utility
+      - CUDA_DEVICE_ORDER=PCI_BUS_ID
     runtime: nvidia
     deploy:
       resources:
@@ -20,7 +23,7 @@ services:
           devices:
             - driver: nvidia
               count: all
-              capabilities: [gpu]
+              capabilities: [gpu, compute, utility]
 
   remote-desktop:
     build:
@@ -35,8 +38,8 @@ services:
       - ./work:/home/user/work:rw
     environment:
       - DISPLAY=:0
-      - USER=user
-      - PASSWORD=Cwit2016
+      - USER=${REMOTE_DESKTOP_USER}
+      - PASSWORD=${REMOTE_DESKTOP_PASSWORD}
       - TZ=Asia/Singapore
       - NVIDIA_VISIBLE_DEVICES=all
       - NVIDIA_DRIVER_CAPABILITIES=all
@@ -64,6 +67,6 @@ services:
       - ./conf/frpc.toml:/etc/frp/frpc.toml:ro
       - ./logs:/frp/logs
     environment:
-      - N_USER=fyp_2022
-      - VPN_PASSWORD=Cwit2022!@#
-      - SERVERCERT=pin-sha256:Pnb4NQY/oONvNeSgMn6P8neFR1h61IjA2mR+9cxvefg=
+      - N_USER=${VPN_USER}
+      - VPN_PASSWORD=${VPN_PASSWORD}
+      - SERVERCERT=${VPN_SERVERCERT}
