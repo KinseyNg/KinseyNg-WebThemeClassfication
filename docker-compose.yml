@@ -7,9 +7,9 @@ services:
     volumes:
       - ./work:/home/jovyan/work
     ports:
-      - 8888:8888
-      - 21:21
-      - 60822:22
+      - "8888:8888"
+      - "21:21"
+      - "60822:22"
     command: "start-notebook.sh --NotebookApp.token="
     environment:
       - PASSWORD=password
