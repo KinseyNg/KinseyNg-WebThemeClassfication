@@ -13,6 +13,14 @@ services:
     command: "start-notebook.sh --NotebookApp.token="
     environment:
       - PASSWORD=password
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
 
   remote-desktop:
     build:
@@ -30,6 +38,16 @@ services:
       - USER=user
       - PASSWORD=Cwit2016
       - TZ=Asia/Singapore
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
     shm_size: '2gb'
     restart: unless-stopped
 
