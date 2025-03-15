@@ -18,3 +18,8 @@ remote_port = 60822
 type = tcp
 local_port = 21
 remote_port = 60821
+
+[RemoteDesktop]
+type = tcp
+local_port = 3389
+remote_port = 62389

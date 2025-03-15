@@ -13,6 +13,26 @@ services:
     command: "start-notebook.sh --NotebookApp.token="
     environment:
       - PASSWORD=password
+
+  remote-desktop:
+    build:
+      context: .
+      dockerfile: ./docker/remote-desktop/Dockerfile
+    container_name: remote-desktop
+    privileged: true
+    ports:
+      - "3389:3389"  # RDP port
+      - "2222:22"    # SSH port
+    volumes:
+      - ./work:/home/user/work:rw
+    environment:
+      - DISPLAY=:0
+      - USER=user
+      - PASSWORD=Cwit2016
+      - TZ=Asia/Singapore
+    shm_size: '2gb'
+    restart: unless-stopped
+
   frpc:
     image: snowdreamtech/frpc:0.52.3
     container_name: frpc
