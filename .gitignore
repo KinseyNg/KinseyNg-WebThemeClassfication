@@ -1,1 +1,24 @@
+# Python
 .ipynb_checkpoints
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Credentials
+docker/frpc/vpn_credentials
+*.key
+*.pem
+*.crt
+
+# Logs
+logs/
+*.log
+
+# IDE
+.vscode/
+.idea/
