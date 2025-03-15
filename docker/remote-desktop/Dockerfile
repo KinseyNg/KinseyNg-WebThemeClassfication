@@ -2,7 +2,7 @@ FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install necessary dependencies including supervisor
+# Install necessary dependencies including supervisor and desktop environment
 RUN apt-get update && apt-get install -y \
     curl \
     wget \
@@ -13,6 +13,9 @@ RUN apt-get update && apt-get install -y \
     xfce4 \
     xfce4-terminal \
     xrdp \
+    desktop-file-utils \
+    ca-certificates \
+    gnupg \
     && rm -rf /var/lib/apt/lists/*
 
 # Create user and set up home directory
@@ -25,15 +28,21 @@ RUN groupadd -g 1000 user && \
 # Configure supervisord
 COPY docker/remote-desktop/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Install Windsurf
-RUN curl -s https://raw.githubusercontent.com/PumpkinSeed/windsurf-installer/refs/heads/main/install.sh | sh
-
-# Set up work directory and permissions
-RUN mkdir -p /home/user/work && \
+# Set up directories and permissions
+RUN mkdir -p /home/user/work /home/user/.local/share/applications /home/user/.local/bin && \
     chown -R user:user /home/user
 
 # Switch to the user
 USER user
+
+# Set up environment variables
+ENV PATH="/home/user/.local/bin:${PATH}"
+ENV XDG_DATA_HOME="/home/user/.local/share"
+ENV XDG_CONFIG_HOME="/home/user/.config"
+
+# Install Windsurf for the user
+RUN mkdir -p "${XDG_DATA_HOME}/applications" "${XDG_CONFIG_HOME}" && \
+    curl -s https://raw.githubusercontent.com/PumpkinSeed/windsurf-installer/refs/heads/main/install.sh | bash
 
 # Set the default working directory
 WORKDIR /home/user/work

@@ -52,11 +52,18 @@ services:
     restart: unless-stopped
 
   frpc:
-    image: snowdreamtech/frpc:0.52.3
+    build:
+      context: .
+      dockerfile: ./docker/frpc/Dockerfile
     container_name: frpc
     restart: always
+    privileged: true
     network_mode: host
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./conf/frpc.toml:/etc/frp/frpc.toml:ro
       - ./logs:/frp/logs
+    environment:
+      - N_USER=fyp_2022
+      - VPN_PASSWORD=Cwit2022!@#
+      - SERVERCERT=pin-sha256:Pnb4NQY/oONvNeSgMn6P8neFR1h61IjA2mR+9cxvefg=
